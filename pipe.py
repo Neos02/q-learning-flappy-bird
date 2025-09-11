@@ -1,19 +1,26 @@
+import random
 import pygame
 
 from main import GREEN, SCREEN_WIDTH, SCREEN_HEIGHT
+from pipe_half import PipeHalf
 
 
-class Pipe(pygame.sprite.Sprite):
+class Pipe(pygame.sprite.Group):
 
     def __init__(self):
         super().__init__()
-        self.width = 60
-        self.height = 350
+        self.gap = 150
         self.speed = 3
-        self.rect = pygame.Rect(SCREEN_WIDTH, SCREEN_HEIGHT - self.height, self.width, self.height)
+        self.min_pipe_height = 100
+        self.gap_top = random.randint(self.min_pipe_height, SCREEN_HEIGHT - self.gap - self.min_pipe_height)
+        self.top_pipe = PipeHalf(0, self.gap_top)
+        self.bottom_pipe = PipeHalf(self.gap_top + self.gap, SCREEN_HEIGHT - self.gap - self.gap_top)
+        self.add(self.top_pipe, self.bottom_pipe)
 
     def move(self):
-        self.rect.move_ip(-self.speed, 0)
+        self.top_pipe.move(-self.speed)
+        self.bottom_pipe.move(-self.speed)
 
     def draw(self, surface):
-        pygame.draw.rect(surface, GREEN, self.rect)
+        self.top_pipe.draw(surface)
+        self.bottom_pipe.draw(surface)
