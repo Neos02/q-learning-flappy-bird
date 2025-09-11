@@ -6,7 +6,7 @@ pygame.init()
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 RED = (200, 50, 50)
-BLUE = (120, 150, 250)
+BLUE = (98, 193, 229)
 
 FPS = 60
 CLOCK = pygame.time.Clock()
@@ -29,6 +29,5 @@ pygame.event.set_allowed([pygame.QUIT, pygame.KEYDOWN])
 
 if __name__ == '__main__':
     from game import Game
-
     game = Game()
     game.run()
