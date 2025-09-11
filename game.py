@@ -11,7 +11,6 @@ from pipe import Pipe
 
 
 def game_over():
-    return None
     DISPLAYSURF.fill(RED)
     pygame.display.update()
     time.sleep(2)
