@@ -1,14 +1,14 @@
 import pygame
 
-from main import GREEN, SCREEN_WIDTH
+from main import GREEN, PIPE_WIDTH, SCREEN_WIDTH
 
 
 class PipeHalf(pygame.sprite.Sprite):
 
-    def __init__(self, top, height):
+    def __init__(self, left, top, height):
         super().__init__()
-        self.width = 60
-        self.rect = pygame.Rect(SCREEN_WIDTH, top, self.width, height)
+        self.width = PIPE_WIDTH
+        self.rect = pygame.Rect(left, top, self.width, height)
 
     def move(self, speed):
         self.rect.move_ip(speed, 0)
