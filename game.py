@@ -70,6 +70,51 @@ class Game:
             pygame.display.flip()
             self.deltatime = CLOCK.tick(FPS) / 1000
 
+    def get_state(self):
+        return (
+            int(self.player.velocity_y < 0),  # moving up
+            int(self.player.velocity_y > 0),  # moving down
+            int(self.player.rect.bottom > self.pipes[self.next_pipe].bottom_pipe.rect.top),  # is below pipe opening
+            int(self.player.rect.top < self.pipes[self.next_pipe].top_pipe.rect.bottom),  # is above pipe opening
+        )
+
+    def step(self, action):
+        reward = 0
+        is_dead = False
+
+        if action == 1:
+            self.player.jump()
+
+        self.player.move(self.deltatime)
+
+        if self.player.has_jumped:
+            for pipe in self.pipes:
+                pipe.move(self.deltatime)
+
+                if pipe.is_off_screen():
+                    pipe.set_left(self.rightmost_pipe.top_pipe.rect.right + self.pipe_gap)
+                    self.rightmost_pipe = pipe
+
+        if self.pipes[self.next_pipe].top_pipe.rect.right < self.player.rect.left:
+            self.score += 1
+            self.next_pipe = (self.next_pipe + 1) % self.num_pipes
+            reward = 1
+
+        DISPLAYSURF.fill(BLUE)
+        self.player.draw(DISPLAYSURF)
+
+        for pipe in self.pipes:
+            pipe.draw(DISPLAYSURF)
+
+        score_text = FONT_SMALL.render(str(self.score), True, WHITE)
+        DISPLAYSURF.blit(score_text, (SCREEN_WIDTH - 100, 10))
+
+        if self.is_player_dead():
+            reward = -10
+            is_dead = True
+
+        return self.get_state(), reward, is_dead
+
     def is_player_dead(self):
         for pipe in self.pipes:
             if pygame.sprite.spritecollideany(self.player, pipe):
