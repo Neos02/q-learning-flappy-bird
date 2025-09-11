@@ -5,12 +5,13 @@ import time
 import pygame
 
 from pygame.locals import *
-from main import SCREEN_WIDTH, DISPLAYSURF, BLUE, CLOCK, FPS, PIPE_WIDTH, RED
+from main import SCREEN_WIDTH, DISPLAYSURF, BLUE, CLOCK, FPS, PIPE_WIDTH, RED, SCREEN_HEIGHT
 from player import Player
 from pipe import Pipe
 
 
 def game_over():
+    return None
     DISPLAYSURF.fill(RED)
     pygame.display.update()
     time.sleep(2)
@@ -21,27 +22,35 @@ def game_over():
 class Game:
 
     def __init__(self):
+        self.deltatime = 0
+        self.last_frame_time = 0
         self.pipe_gap = 200
         self.num_pipes = math.ceil(SCREEN_WIDTH / (self.pipe_gap + PIPE_WIDTH))
-        self.pipes = [Pipe(i * (self.pipe_gap + PIPE_WIDTH) + SCREEN_WIDTH // 2) for i in range(self.num_pipes)]
+        self.pipes = [Pipe(i * (self.pipe_gap + PIPE_WIDTH) + SCREEN_WIDTH // 2, (SCREEN_HEIGHT - self.pipe_gap) // 2 if i == 0 else None) for i in range(self.num_pipes)]
         self.rightmost_pipe = self.pipes[self.num_pipes - 1]
         self.player = Player()
+        self.has_started = False
 
     def run(self):
         while True:
+            ticks = pygame.time.get_ticks()
+            self.deltatime = (ticks - self.last_frame_time) / 1000
+            self.last_frame_time = ticks
+
             for event in pygame.event.get():
                 if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
                     pygame.quit()
                     sys.exit()
 
-            self.player.move()
+            self.player.move(self.deltatime)
 
-            for pipe in self.pipes:
-                pipe.move()
+            if self.player.has_jumped:
+                for pipe in self.pipes:
+                    pipe.move(self.deltatime)
 
-                if pipe.is_off_screen():
-                    pipe.set_left(self.rightmost_pipe.top_pipe.rect.right + self.pipe_gap)
-                    self.rightmost_pipe = pipe
+                    if pipe.is_off_screen():
+                        pipe.set_left(self.rightmost_pipe.top_pipe.rect.right + self.pipe_gap)
+                        self.rightmost_pipe = pipe
 
             DISPLAYSURF.fill(BLUE)
             self.player.draw(DISPLAYSURF)
