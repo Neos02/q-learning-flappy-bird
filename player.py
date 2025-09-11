@@ -9,9 +9,10 @@ class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
         self.gravity = 0.5
-        self.height = SCREEN_HEIGHT // 2
         self.velocity_y = 0
-        self.size = 10
+        self.size = 20
+        self.rect = pygame.Rect(0, 0, self.size, self.size)
+        self.rect.center = (SCREEN_WIDTH // 4, SCREEN_HEIGHT // 2)
         self.jump_power = 10
         self.jump_cooldown_ms = 225
         self.last_jump_time = 0
@@ -25,7 +26,7 @@ class Player(pygame.sprite.Sprite):
             self.last_jump_time = ticks
 
         self.velocity_y += self.gravity
-        self.height += self.velocity_y
+        self.rect.move_ip(0, self.velocity_y)
 
     def draw(self, surface):
-        pygame.draw.circle(surface, RED, (SCREEN_WIDTH // 4, self.height), self.size)
+        pygame.draw.rect(surface, RED, self.rect)
