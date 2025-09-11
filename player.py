@@ -1,7 +1,7 @@
 import pygame
 from pygame.math import clamp
 
-from main import RED, SCREEN_WIDTH, SCREEN_HEIGHT, IMAGE_SCALE_FACTOR
+from main import SCREEN_WIDTH, SCREEN_HEIGHT, IMAGE_SCALE_FACTOR
 from pygame.locals import *
 
 

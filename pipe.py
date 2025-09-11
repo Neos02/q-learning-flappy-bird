@@ -13,8 +13,8 @@ class Pipe(pygame.sprite.Group):
         self.speed = 200
         self.min_pipe_height = 50
         self.gap_top = random.randint(self.min_pipe_height, SCREEN_HEIGHT - self.gap - self.min_pipe_height) if height is None else height
-        self.top_pipe = PipeHalf(left, 0, self.gap_top)
-        self.bottom_pipe = PipeHalf(left, self.gap_top + self.gap, SCREEN_HEIGHT - self.gap - self.gap_top)
+        self.top_pipe = PipeHalf(left, self.gap_top)
+        self.bottom_pipe = PipeHalf(left, self.gap + self.gap_top, True)
         self.add(self.top_pipe, self.bottom_pipe)
 
     def move(self, deltatime):

@@ -1,7 +1,6 @@
 import math
 import sys
 import time
-from time import sleep
 
 import pygame
 
@@ -27,7 +26,7 @@ class Game:
 
     def __init__(self):
         self.deltatime = 0
-        self.pipe_gap = 220
+        self.pipe_gap = 180
         self.num_pipes = math.ceil(SCREEN_WIDTH / (self.pipe_gap + PIPE_WIDTH))
         self.pipes = [Pipe(i * (self.pipe_gap + PIPE_WIDTH) + SCREEN_WIDTH // 2, (SCREEN_HEIGHT - self.pipe_gap) // 2 if i == 0 else None) for i in range(self.num_pipes)]
         self.rightmost_pipe = self.pipes[self.num_pipes - 1]
