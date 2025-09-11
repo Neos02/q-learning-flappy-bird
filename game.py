@@ -1,11 +1,13 @@
 import math
 import sys
 import time
+from time import sleep
 
 import pygame
 
 from pygame.locals import *
-from main import SCREEN_WIDTH, DISPLAYSURF, BLUE, CLOCK, FPS, PIPE_WIDTH, RED, SCREEN_HEIGHT, FONT_LARGE, WHITE
+from main import SCREEN_WIDTH, DISPLAYSURF, BLUE, CLOCK, FPS, PIPE_WIDTH, RED, SCREEN_HEIGHT, FONT_LARGE, WHITE, \
+    FONT_SMALL
 from player import Player
 from pipe import Pipe
 
@@ -25,11 +27,13 @@ class Game:
 
     def __init__(self):
         self.deltatime = 0
-        self.pipe_gap = 200
+        self.pipe_gap = 220
         self.num_pipes = math.ceil(SCREEN_WIDTH / (self.pipe_gap + PIPE_WIDTH))
         self.pipes = [Pipe(i * (self.pipe_gap + PIPE_WIDTH) + SCREEN_WIDTH // 2, (SCREEN_HEIGHT - self.pipe_gap) // 2 if i == 0 else None) for i in range(self.num_pipes)]
         self.rightmost_pipe = self.pipes[self.num_pipes - 1]
+        self.next_pipe = 0
         self.player = Player()
+        self.score = 0
 
     def run(self):
         while 1:
@@ -48,11 +52,18 @@ class Game:
                         pipe.set_left(self.rightmost_pipe.top_pipe.rect.right + self.pipe_gap)
                         self.rightmost_pipe = pipe
 
+            if self.pipes[self.next_pipe].top_pipe.rect.right < self.player.rect.left:
+                self.score += 1
+                self.next_pipe = (self.next_pipe + 1) % self.num_pipes
+
             DISPLAYSURF.fill(BLUE)
             self.player.draw(DISPLAYSURF)
 
             for pipe in self.pipes:
                 pipe.draw(DISPLAYSURF)
+
+            score_text = FONT_SMALL.render(str(self.score), True, WHITE)
+            DISPLAYSURF.blit(score_text, (SCREEN_WIDTH - 100, 10))
 
             if self.is_player_dead():
                 game_over()
