@@ -5,13 +5,16 @@ import time
 import pygame
 
 from pygame.locals import *
-from main import SCREEN_WIDTH, DISPLAYSURF, BLUE, CLOCK, FPS, PIPE_WIDTH, RED, SCREEN_HEIGHT
+from main import SCREEN_WIDTH, DISPLAYSURF, BLUE, CLOCK, FPS, PIPE_WIDTH, RED, SCREEN_HEIGHT, FONT_LARGE, WHITE
 from player import Player
 from pipe import Pipe
 
 
 def game_over():
+    game_over_text = FONT_LARGE.render("GAME OVER", True, WHITE)
     DISPLAYSURF.fill(RED)
+    DISPLAYSURF.blit(game_over_text, ((SCREEN_WIDTH - game_over_text.get_width()) / 2, (SCREEN_HEIGHT - game_over_text.get_height()) / 2))
+
     pygame.display.update()
     time.sleep(2)
     pygame.quit()
