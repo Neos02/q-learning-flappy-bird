@@ -26,7 +26,7 @@ class Player(pygame.sprite.Sprite):
             self.last_jump_time = ticks
 
         self.velocity_y += self.gravity
-        self.rect.move_ip(0, self.velocity_y)
+        self.rect.top = max(0, self.rect.top + self.velocity_y)
 
     def draw(self, surface):
         pygame.draw.rect(surface, RED, self.rect)
