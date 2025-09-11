@@ -1,16 +1,30 @@
-# This is a sample Python script.
+import pygame
+import sys
 
-# Press ⌃F5 to execute it or replace it with your code.
-# Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
+from pygame.locals import *
+
+pygame.init()
+
+BLACK = (0, 0, 0)
+GREEN = (50, 100, 50)
+RED = (200, 50, 50)
+BLUE = (120, 150, 250)
+
+FPS = 60
+CLOCK = pygame.time.Clock()
+
+DISPLAYSURF = pygame.display.set_mode((800, 600))
+pygame.display.set_caption('Flappy Bird')
 
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press F9 to toggle the breakpoint.
-
-
-# Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    print_hi('PyCharm')
+    while True:
+        for event in pygame.event.get():
+            if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
+                pygame.quit()
+                sys.exit()
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+        DISPLAYSURF.fill(BLUE)
+
+        pygame.display.update()
+        CLOCK.tick(FPS)
