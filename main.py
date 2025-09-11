@@ -1,4 +1,5 @@
 import pygame
+from pygame import FULLSCREEN, DOUBLEBUF, SCALED
 
 BLACK = (0, 0, 0)
 GREEN = (50, 100, 50)
@@ -13,8 +14,10 @@ SCREEN_HEIGHT = 600
 
 PIPE_WIDTH = 60
 
-DISPLAYSURF = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+DISPLAYSURF = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), SCALED | DOUBLEBUF, vsync=1)
 pygame.display.set_caption('Flappy Bird')
+
+pygame.event.set_allowed([pygame.QUIT, pygame.KEYDOWN])
 
 
 if __name__ == '__main__':

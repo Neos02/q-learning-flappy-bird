@@ -30,7 +30,7 @@ class Game:
         self.player = Player()
 
     def run(self):
-        while True:
+        while 1:
             for event in pygame.event.get():
                 if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
                     pygame.quit()
@@ -55,7 +55,7 @@ class Game:
             if self.is_player_dead():
                 game_over()
 
-            pygame.display.update()
+            pygame.display.flip()
             self.deltatime = CLOCK.tick(FPS) / 1000
 
     def is_player_dead(self):
