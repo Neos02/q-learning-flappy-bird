@@ -23,20 +23,14 @@ class Game:
 
     def __init__(self):
         self.deltatime = 0
-        self.last_frame_time = 0
         self.pipe_gap = 200
         self.num_pipes = math.ceil(SCREEN_WIDTH / (self.pipe_gap + PIPE_WIDTH))
         self.pipes = [Pipe(i * (self.pipe_gap + PIPE_WIDTH) + SCREEN_WIDTH // 2, (SCREEN_HEIGHT - self.pipe_gap) // 2 if i == 0 else None) for i in range(self.num_pipes)]
         self.rightmost_pipe = self.pipes[self.num_pipes - 1]
         self.player = Player()
-        self.has_started = False
 
     def run(self):
         while True:
-            ticks = pygame.time.get_ticks()
-            self.deltatime = (ticks - self.last_frame_time) / 1000
-            self.last_frame_time = ticks
-
             for event in pygame.event.get():
                 if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
                     pygame.quit()
@@ -62,7 +56,7 @@ class Game:
                 game_over()
 
             pygame.display.update()
-            CLOCK.tick(FPS)
+            self.deltatime = CLOCK.tick(FPS) / 1000
 
     def is_player_dead(self):
         for pipe in self.pipes:
