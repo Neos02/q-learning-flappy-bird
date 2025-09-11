@@ -13,18 +13,28 @@ BLUE = (120, 150, 250)
 FPS = 60
 CLOCK = pygame.time.Clock()
 
-DISPLAYSURF = pygame.display.set_mode((800, 600))
+SCREEN_WIDTH = 800
+SCREEN_HEIGHT = 600
+
+DISPLAYSURF = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption('Flappy Bird')
 
 
 if __name__ == '__main__':
+    from player import Player
+
+    player = Player()
+
     while True:
         for event in pygame.event.get():
             if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
                 pygame.quit()
                 sys.exit()
 
+        player.move()
+
         DISPLAYSURF.fill(BLUE)
+        player.draw(DISPLAYSURF)
 
         pygame.display.update()
         CLOCK.tick(FPS)
