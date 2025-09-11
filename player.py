@@ -30,3 +30,6 @@ class Player(pygame.sprite.Sprite):
 
     def draw(self, surface):
         pygame.draw.rect(surface, RED, self.rect)
+
+    def is_off_screen(self):
+        return self.rect.bottom > SCREEN_HEIGHT

@@ -1,11 +1,21 @@
 import math
 import sys
+import time
+
 import pygame
 
 from pygame.locals import *
-from main import SCREEN_WIDTH, DISPLAYSURF, BLUE, CLOCK, FPS, PIPE_WIDTH
+from main import SCREEN_WIDTH, DISPLAYSURF, BLUE, CLOCK, FPS, PIPE_WIDTH, RED
 from player import Player
 from pipe import Pipe
+
+
+def game_over():
+    DISPLAYSURF.fill(RED)
+    pygame.display.update()
+    time.sleep(2)
+    pygame.quit()
+    sys.exit()
 
 
 class Game:
@@ -13,7 +23,7 @@ class Game:
     def __init__(self):
         self.pipe_gap = 200
         self.num_pipes = math.ceil(SCREEN_WIDTH / (self.pipe_gap + PIPE_WIDTH))
-        self.pipes = [Pipe(i * (self.pipe_gap + PIPE_WIDTH)) for i in range(self.num_pipes)]
+        self.pipes = [Pipe(i * (self.pipe_gap + PIPE_WIDTH) + SCREEN_WIDTH // 2) for i in range(self.num_pipes)]
         self.rightmost_pipe = self.pipes[self.num_pipes - 1]
         self.player = Player()
 
@@ -39,5 +49,15 @@ class Game:
             for pipe in self.pipes:
                 pipe.draw(DISPLAYSURF)
 
+            if self.is_player_dead():
+                game_over()
+
             pygame.display.update()
             CLOCK.tick(FPS)
+
+    def is_player_dead(self):
+        for pipe in self.pipes:
+            if pygame.sprite.spritecollideany(self.player, pipe):
+                return True
+
+        return self.player.is_off_screen()

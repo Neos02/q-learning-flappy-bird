@@ -9,9 +9,9 @@ class Pipe(pygame.sprite.Group):
 
     def __init__(self, left):
         super().__init__()
-        self.gap = 150
+        self.gap = 180
         self.speed = 3
-        self.min_pipe_height = 100
+        self.min_pipe_height = 50
         self.gap_top = random.randint(self.min_pipe_height, SCREEN_HEIGHT - self.gap - self.min_pipe_height)
         self.top_pipe = PipeHalf(left, 0, self.gap_top)
         self.bottom_pipe = PipeHalf(left, self.gap_top + self.gap, SCREEN_HEIGHT - self.gap - self.gap_top)
