@@ -32,6 +32,39 @@ class Game:
         self.next_pipe = 0
         self.player = Player()
         self.score = 0
+        self.ground_image = pygame.transform.scale_by(pygame.image.load('images/ground.png').convert(), IMAGE_SCALE_FACTOR)
+        self.ground_rect = self.ground_image.get_rect()
+        self.ground_rect.bottom = SCREEN_HEIGHT
+        self.ground_rect.left = 0
+
+    def _move(self):
+        self.player.move(self.deltatime)
+
+        if self.player.has_jumped:
+            for pipe in self.pipes:
+                pipe.move(self.deltatime)
+
+                if pipe.is_off_screen():
+                    pipe.set_left(self.rightmost_pipe.top_pipe.rect.right + PIPE_GAP)
+                    self.rightmost_pipe = pipe
+
+            self.ground_rect.left = (self.ground_rect.left - self.pipes[self.next_pipe].speed * self.deltatime) % (-self.ground_image.get_width() // 2)
+
+        if self.pipes[self.next_pipe].top_pipe.rect.right < self.player.rect.left:
+            self.score += 1
+            self.next_pipe = (self.next_pipe + 1) % self.num_pipes
+
+    def _draw(self):
+        DISPLAYSURF.fill(BLUE)
+        self.player.draw(DISPLAYSURF)
+
+        for pipe in self.pipes:
+            pipe.draw(DISPLAYSURF)
+
+        DISPLAYSURF.blit(self.ground_image, self.ground_rect)
+
+        score_text = FONT_SMALL.render(str(self.score), True, WHITE)
+        DISPLAYSURF.blit(score_text, (SCREEN_WIDTH - 100, 10))
 
     def run(self):
         while 1:
@@ -40,28 +73,8 @@ class Game:
                     pygame.quit()
                     sys.exit()
 
-            self.player.move(self.deltatime)
-
-            if self.player.has_jumped:
-                for pipe in self.pipes:
-                    pipe.move(self.deltatime)
-
-                    if pipe.is_off_screen():
-                        pipe.set_left(self.rightmost_pipe.top_pipe.rect.right + self.pipe_gap)
-                        self.rightmost_pipe = pipe
-
-            if self.pipes[self.next_pipe].top_pipe.rect.right < self.player.rect.left:
-                self.score += 1
-                self.next_pipe = (self.next_pipe + 1) % self.num_pipes
-
-            DISPLAYSURF.fill(BLUE)
-            self.player.draw(DISPLAYSURF)
-
-            for pipe in self.pipes:
-                pipe.draw(DISPLAYSURF)
-
-            score_text = FONT_SMALL.render(str(self.score), True, WHITE)
-            DISPLAYSURF.blit(score_text, (SCREEN_WIDTH - 100, 10))
+            self._move()
+            self._draw()
 
             if self.is_player_dead():
                 game_over()
@@ -84,34 +97,12 @@ class Game:
     def step(self, action):
         reward = 15
         is_dead = False
-        pipe = self.pipes[self.next_pipe]
 
         if action == 1:
             self.player.jump()
 
-        self.player.move(self.deltatime)
-
-        if self.player.has_jumped:
-            for pipe in self.pipes:
-                pipe.move(self.deltatime)
-
-                if pipe.is_off_screen():
-                    pipe.set_left(self.rightmost_pipe.top_pipe.rect.right + PIPE_GAP)
-                    self.rightmost_pipe = pipe
-
-        if pipe.top_pipe.rect.center < self.player.rect.center:
-            self.score += 1
-            self.next_pipe = (self.next_pipe + 1) % self.num_pipes
-
-        DISPLAYSURF.fill(BLUE)
-        self.player.draw(DISPLAYSURF)
-
-        for pipe in self.pipes:
-            pipe.draw(DISPLAYSURF)
-
-        score_text = FONT_SMALL.render(str(self.score), True, WHITE)
-        DISPLAYSURF.blit(score_text, (SCREEN_WIDTH - 100, 10))
-
+        self._move()
+        self._draw()
         pygame.display.flip()
 
         if self.is_player_dead():

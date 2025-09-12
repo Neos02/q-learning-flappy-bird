@@ -40,7 +40,7 @@ class Agent:
             self.game = Game()
             current_state = self.game.get_state()
             done = False
-            is_checkpoint = (epoch < 100 and epoch % 10 == 0) or (100 <= epoch < 1000 and epoch % 200 == 0) or (
+            is_checkpoint = (epoch <= 100 and epoch % 10 == 0) or (100 <= epoch < 1000 and epoch % 200 == 0) or (
                     epoch >= 1000 and epoch % 500 == 0)
 
             # decay epsilon
