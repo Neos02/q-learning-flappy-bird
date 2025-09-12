@@ -32,8 +32,11 @@ class Agent:
 
         return np.argmax(self.table[state])
 
-    def train(self):
-        for epoch in range(1, self.epochs + 1):
+    def train(self, epoch=1):
+        if epoch != 1:
+            self._load_model(epoch)
+
+        for epoch in range(epoch, self.epochs + 1):
             self.game = Game()
             current_state = self.game.get_state()
             done = False
@@ -72,3 +75,12 @@ class Agent:
                 self.game.deltatime = CLOCK.tick(FPS) / 1000
 
             self.score.append(self.game.score)
+
+    def _load_model(self, epoch):
+        filename = f'models/bird_model_{epoch}.pickle'
+
+        with open(filename, 'rb') as file:
+            self.table = pickle.load(file)
+
+        # calculate this epoch's epsilon value to prevent random actions
+        self.epsilon = max(self.epsilon * self.epsilon_decay ** epoch, self.epsilon_min)
