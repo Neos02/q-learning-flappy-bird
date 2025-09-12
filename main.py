@@ -28,6 +28,6 @@ pygame.event.set_allowed([pygame.QUIT, pygame.KEYDOWN])
 
 
 if __name__ == '__main__':
-    from game import Game
-    game = Game()
-    game.run()
+    from agent import Agent
+    agent = Agent()
+    agent.train()

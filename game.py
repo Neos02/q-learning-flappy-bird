@@ -71,11 +71,17 @@ class Game:
             self.deltatime = CLOCK.tick(FPS) / 1000
 
     def get_state(self):
+        pipe = self.pipes[self.next_pipe]
+        pipe_center = ((pipe.top_pipe.rect.left + pipe.top_pipe.rect.right) / 2, pipe.top_pipe.rect.bottom + pipe.gap / 2)
+
         return (
             int(self.player.velocity_y < 0),  # moving up
             int(self.player.velocity_y > 0),  # moving down
-            int(self.player.rect.bottom > self.pipes[self.next_pipe].bottom_pipe.rect.top),  # is below pipe opening
-            int(self.player.rect.top < self.pipes[self.next_pipe].top_pipe.rect.bottom),  # is above pipe opening
+            int(self.player.rect.bottom > pipe.bottom_pipe.rect.top),  # is below pipe opening
+            int(self.player.rect.top < pipe.top_pipe.rect.bottom),  # is above pipe opening
+            int(self.player.rect.right < pipe_center[0]),  # is left of pipe center
+            int(self.player.rect.top > pipe_center[1]),  # is below pipe center
+            int(self.player.rect.right > pipe.top_pipe.rect.left and self.player.rect.left < pipe.top_pipe.rect.right)  # is inside pipe opening
         )
 
     def step(self, action):
@@ -109,11 +115,18 @@ class Game:
         score_text = FONT_SMALL.render(str(self.score), True, WHITE)
         DISPLAYSURF.blit(score_text, (SCREEN_WIDTH - 100, 10))
 
+        pygame.display.flip()
+
         if self.is_player_dead():
             reward = -10
             is_dead = True
 
-        return self.get_state(), reward, is_dead
+        current_state = self.get_state()
+
+        if reward == 0 and current_state[3] == 1:
+            reward = -1
+
+        return current_state, reward, is_dead
 
     def is_player_dead(self):
         for pipe in self.pipes:

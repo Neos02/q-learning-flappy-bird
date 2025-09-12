@@ -24,9 +24,8 @@ class Player(pygame.sprite.Sprite):
 
     def move(self, deltatime):
         pressed_keys = pygame.key.get_pressed()
-        ticks = pygame.time.get_ticks()
 
-        if pressed_keys[K_SPACE] and ticks - self.last_jump_time >= self.jump_cooldown_ms:
+        if pressed_keys[K_SPACE] and self.can_jump():
             self.jump()
 
         # show flap image when the bird is moving up
@@ -46,7 +45,12 @@ class Player(pygame.sprite.Sprite):
     def is_off_screen(self):
         return self.rect.bottom > SCREEN_HEIGHT
 
+    def can_jump(self):
+        ticks = pygame.time.get_ticks()
+        return ticks - self.last_jump_time >= self.jump_cooldown_ms
+
     def jump(self):
+        ticks = pygame.time.get_ticks()
         self.velocity_y = -self.jump_power
         self.last_jump_time = ticks
         self.has_jumped = True
