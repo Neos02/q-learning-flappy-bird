@@ -87,11 +87,10 @@ class Game:
         pipe_right_center = (pipe.top_pipe.rect.right, pipe.top_pipe.rect.bottom + pipe.gap / 2)
         max_horizontal_distance = (PIPE_GAP // GAME_STATE_SCALE_FACTOR) - 1
         horizontal_distance = min((pipe_right_center[0] - self.player.rect.left) // GAME_STATE_SCALE_FACTOR, max_horizontal_distance)
-        vertical_distance = int(max(0, (pipe_right_center[1] - self.player.rect.center[1] + SCREEN_HEIGHT) // GAME_STATE_SCALE_FACTOR))
 
         return (
-            int(horizontal_distance),  # scaled horizontal distance from right of pipe
-            int(vertical_distance)  # scaled + shifted vertical distance from center of pipe
+            int(horizontal_distance),  # scaled horizontal distance from center of pipe
+            int(max(0, (pipe_right_center[1] - self.player.rect.center[1] + SCREEN_HEIGHT) // GAME_STATE_SCALE_FACTOR))  # scaled + shifted vertical distance from center of pipe
         )
 
     def step(self, action):

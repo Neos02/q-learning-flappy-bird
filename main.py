@@ -6,7 +6,7 @@ pygame.init()
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 RED = (200, 50, 50)
-BLUE = (98, 193, 229)
+BLUE = (112, 197, 206)
 
 FPS = 60
 CLOCK = pygame.time.Clock()
@@ -32,4 +32,4 @@ pygame.event.set_allowed([pygame.QUIT, pygame.KEYDOWN])
 if __name__ == '__main__':
     from agent import Agent
     agent = Agent()
-    agent.train()
+    agent.train(epoch=8000)
