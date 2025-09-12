@@ -7,7 +7,7 @@ import pygame
 from game import Game
 from pygame.locals import *
 
-from main import CLOCK, FPS
+from main import CLOCK, FPS, GAME_STATE_SCALE_FACTOR, SCREEN_HEIGHT, PIPE_GAP
 
 
 class Agent:
@@ -16,17 +16,14 @@ class Agent:
         self.learning_rate = 0.01
         self.discount_factor = 0.95
         self.epsilon = 0.2
-        self.epsilon_decay = 0.9992
+        self.epsilon_decay = 0.99
         self.epsilon_min = 0.001
         self.epochs = 10000
-        self.table = np.zeros((2, 2, 2, 2, 2, 2, 2, 2))
+        self.table = np.zeros((2, 2, PIPE_GAP // GAME_STATE_SCALE_FACTOR, SCREEN_HEIGHT // GAME_STATE_SCALE_FACTOR * 2, 2))
         self.game = None
         self.score = []
 
     def get_action(self, state):
-        if not self.game.player.can_jump():
-            return 0
-
         if not self.game.player.has_jumped:
             return 1
 
@@ -53,7 +50,7 @@ class Agent:
 
             # occasionally save latest model
             if is_checkpoint:
-                with open(f'models/snake_model_{epoch}.pickle', 'wb') as file:
+                with open(f'models/bird_model_{epoch}.pickle', 'wb') as file:
                     # noinspection PyTypeChecker
                     pickle.dump(self.table, file)
 

@@ -6,7 +6,7 @@ import pygame
 
 from pygame.locals import *
 from main import SCREEN_WIDTH, DISPLAYSURF, BLUE, CLOCK, FPS, PIPE_WIDTH, RED, SCREEN_HEIGHT, FONT_LARGE, WHITE, \
-    FONT_SMALL
+    FONT_SMALL, GAME_STATE_SCALE_FACTOR, PIPE_GAP, IMAGE_SCALE_FACTOR
 from player import Player
 from pipe import Pipe
 
@@ -26,9 +26,8 @@ class Game:
 
     def __init__(self):
         self.deltatime = 0
-        self.pipe_gap = 180
-        self.num_pipes = math.ceil(SCREEN_WIDTH / (self.pipe_gap + PIPE_WIDTH))
-        self.pipes = [Pipe(i * (self.pipe_gap + PIPE_WIDTH) + SCREEN_WIDTH // 2, (SCREEN_HEIGHT - self.pipe_gap) // 2 if i == 0 else None) for i in range(self.num_pipes)]
+        self.num_pipes = math.ceil(SCREEN_WIDTH / (PIPE_GAP + PIPE_WIDTH))
+        self.pipes = [Pipe(i * (PIPE_GAP + PIPE_WIDTH) + SCREEN_WIDTH // 2, (SCREEN_HEIGHT - PIPE_GAP) // 2 if i == 0 else None) for i in range(self.num_pipes)]
         self.rightmost_pipe = self.pipes[self.num_pipes - 1]
         self.next_pipe = 0
         self.player = Player()
@@ -73,20 +72,19 @@ class Game:
     def get_state(self):
         pipe = self.pipes[self.next_pipe]
         pipe_center = ((pipe.top_pipe.rect.left + pipe.top_pipe.rect.right) / 2, pipe.top_pipe.rect.bottom + pipe.gap / 2)
+        max_horizontal_distance = (PIPE_GAP // GAME_STATE_SCALE_FACTOR) - 1
 
         return (
             int(self.player.velocity_y < 0),  # moving up
             int(self.player.velocity_y > 0),  # moving down
-            int(self.player.rect.bottom > pipe.bottom_pipe.rect.top),  # is below pipe opening
-            int(self.player.rect.top < pipe.top_pipe.rect.bottom),  # is above pipe opening
-            int(self.player.rect.right < pipe_center[0]),  # is left of pipe center
-            int(self.player.rect.top > pipe_center[1]),  # is below pipe center
-            int(self.player.rect.right > pipe.top_pipe.rect.left and self.player.rect.left < pipe.top_pipe.rect.right)  # is inside pipe opening
+            int(max(0, min((pipe_center[0] - self.player.rect.center[0]) // GAME_STATE_SCALE_FACTOR, max_horizontal_distance))),  # scaled horizontal distance from center of pipe
+            int((pipe_center[1] - self.player.rect.center[1] + SCREEN_HEIGHT) // GAME_STATE_SCALE_FACTOR)  # scaled + shifted vertical distance from center of pipe
         )
 
     def step(self, action):
-        reward = 0
+        reward = 15
         is_dead = False
+        pipe = self.pipes[self.next_pipe]
 
         if action == 1:
             self.player.jump()
@@ -98,13 +96,12 @@ class Game:
                 pipe.move(self.deltatime)
 
                 if pipe.is_off_screen():
-                    pipe.set_left(self.rightmost_pipe.top_pipe.rect.right + self.pipe_gap)
+                    pipe.set_left(self.rightmost_pipe.top_pipe.rect.right + PIPE_GAP)
                     self.rightmost_pipe = pipe
 
-        if self.pipes[self.next_pipe].top_pipe.rect.right < self.player.rect.left:
+        if pipe.top_pipe.rect.center < self.player.rect.center:
             self.score += 1
             self.next_pipe = (self.next_pipe + 1) % self.num_pipes
-            reward = 1
 
         DISPLAYSURF.fill(BLUE)
         self.player.draw(DISPLAYSURF)
@@ -118,13 +115,10 @@ class Game:
         pygame.display.flip()
 
         if self.is_player_dead():
-            reward = -10
             is_dead = True
+            reward = -1000
 
         current_state = self.get_state()
-
-        if reward == 0 and current_state[3] == 1:
-            reward = -1
 
         return current_state, reward, is_dead
 
