@@ -14,12 +14,12 @@ class Agent:
 
     def __init__(self):
         self.learning_rate = 0.01
-        self.discount_factor = 0.95
-        self.epsilon = 0.2
+        self.discount_factor = 1
+        self.epsilon = 0
         self.epsilon_decay = 0.99
-        self.epsilon_min = 0.001
+        self.epsilon_min = 0
         self.epochs = 10000
-        self.table = np.zeros((2, 2, PIPE_GAP // GAME_STATE_SCALE_FACTOR, SCREEN_HEIGHT // GAME_STATE_SCALE_FACTOR * 2, 2))
+        self.table = np.zeros((PIPE_GAP // GAME_STATE_SCALE_FACTOR, SCREEN_HEIGHT // GAME_STATE_SCALE_FACTOR * 2, 2))
         self.game = None
         self.score = []
 
@@ -39,6 +39,7 @@ class Agent:
         for epoch in range(epoch, self.epochs + 1):
             self.game = Game()
             current_state = self.game.get_state()
+            prev_state = None
             done = False
             is_checkpoint = (epoch <= 100 and epoch % 10 == 0) or (100 <= epoch < 1000 and epoch % 200 == 0) or (
                     epoch >= 1000 and epoch % 500 == 0)
@@ -63,14 +64,15 @@ class Agent:
                         pygame.quit()
                         sys.exit()
 
-                # get best action and take it
-                action = self.get_action(current_state)
-                new_state, reward, done = self.game.step(action)
+                if self.game.get_state() != prev_state:
+                    # get best action and take it
+                    action = self.get_action(current_state)
+                    new_state, reward, done = self.game.step(action)
 
-                # update table using Bellman equation
-                self.table[current_state][action] = (1 - self.learning_rate) * self.table[current_state][action]\
-                    + self.learning_rate * (reward + self.discount_factor * np.max(self.table[new_state]))
-                current_state = new_state
+                    # update table using Bellman equation
+                    self.table[current_state][action] = (1 - self.learning_rate) * self.table[current_state][action]\
+                        + self.learning_rate * (reward + self.discount_factor * np.max(self.table[new_state]))
+                    current_state = new_state
 
                 self.game.deltatime = CLOCK.tick(FPS) / 1000
 

@@ -84,19 +84,20 @@ class Game:
 
     def get_state(self):
         pipe = self.pipes[self.next_pipe]
-        pipe_center = ((pipe.top_pipe.rect.left + pipe.top_pipe.rect.right) / 2, pipe.top_pipe.rect.bottom + pipe.gap / 2)
+        pipe_right_center = (pipe.top_pipe.rect.right, pipe.top_pipe.rect.bottom + pipe.gap / 2)
         max_horizontal_distance = (PIPE_GAP // GAME_STATE_SCALE_FACTOR) - 1
+        horizontal_distance = min((pipe_right_center[0] - self.player.rect.left) // GAME_STATE_SCALE_FACTOR, max_horizontal_distance)
+        vertical_distance = int(max(0, (pipe_right_center[1] - self.player.rect.center[1] + SCREEN_HEIGHT) // GAME_STATE_SCALE_FACTOR))
 
         return (
-            int(self.player.velocity_y < 0),  # moving up
-            int(self.player.velocity_y > 0),  # moving down
-            int(max(0, min((pipe_center[0] - self.player.rect.center[0]) // GAME_STATE_SCALE_FACTOR, max_horizontal_distance))),  # scaled horizontal distance from center of pipe
-            int((pipe_center[1] - self.player.rect.center[1] + SCREEN_HEIGHT) // GAME_STATE_SCALE_FACTOR)  # scaled + shifted vertical distance from center of pipe
+            int(horizontal_distance),  # scaled horizontal distance from right of pipe
+            int(vertical_distance)  # scaled + shifted vertical distance from center of pipe
         )
 
     def step(self, action):
         reward = 15
         is_dead = False
+        prev_score = self.score
 
         if action == 1:
             self.player.jump()
@@ -104,6 +105,9 @@ class Game:
         self._move()
         self._draw()
         pygame.display.flip()
+
+        if self.score > prev_score:
+            reward = 100
 
         if self.is_player_dead():
             is_dead = True

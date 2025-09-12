@@ -32,4 +32,4 @@ pygame.event.set_allowed([pygame.QUIT, pygame.KEYDOWN])
 if __name__ == '__main__':
     from agent import Agent
     agent = Agent()
-    agent.train(epoch=90)
+    agent.train()
