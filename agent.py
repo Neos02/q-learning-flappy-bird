@@ -14,7 +14,7 @@ class Agent:
 
     def __init__(self):
         self.learning_rate = 0.01
-        self.discount_factor = 1
+        self.discount_factor = 0.95
         self.epsilon = 0
         self.epsilon_decay = 0.99
         self.epsilon_min = 0
