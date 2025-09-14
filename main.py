@@ -20,7 +20,7 @@ PIPE_GAP = 180
 FONT_SMALL = pygame.font.SysFont("Verdana", 16)
 FONT_LARGE = pygame.font.SysFont("Verdana", 60)
 
-IMAGE_SCALE_FACTOR = 0.25
+IMAGE_SCALE_FACTOR = 2
 GAME_STATE_SCALE_FACTOR = 10
 
 DISPLAYSURF = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), SCALED | DOUBLEBUF, vsync=1)
