@@ -6,9 +6,10 @@ import pygame
 
 from pygame.locals import *
 from main import SCREEN_WIDTH, DISPLAYSURF, BLUE, CLOCK, FPS, PIPE_WIDTH, RED, SCREEN_HEIGHT, FONT_LARGE, WHITE, \
-    FONT_SMALL, GAME_STATE_SCALE_FACTOR, PIPE_GAP, IMAGE_SCALE_FACTOR
+    FONT_SMALL, GAME_STATE_SCALE_FACTOR, PIPE_GAP, PIPE_SPEED
 from player import Player
 from pipe import Pipe
+from scrolling_image import ScrollingImage
 
 
 def game_over():
@@ -32,10 +33,8 @@ class Game:
         self.next_pipe = 0
         self.player = Player()
         self.score = 0
-        self.ground_image = pygame.transform.scale_by(pygame.image.load('images/ground.png').convert(), IMAGE_SCALE_FACTOR)
-        self.ground_rect = self.ground_image.get_rect()
-        self.ground_rect.bottom = SCREEN_HEIGHT
-        self.ground_rect.left = 0
+        self.ground_image = ScrollingImage("images/ground.png")
+        self.ground_image.rect.top = SCREEN_HEIGHT - self.ground_image.image.get_height()
 
     def _move(self):
         self.player.move(self.deltatime)
@@ -48,7 +47,7 @@ class Game:
                     pipe.set_left(self.rightmost_pipe.top_pipe.rect.right + PIPE_GAP)
                     self.rightmost_pipe = pipe
 
-            self.ground_rect.left = (self.ground_rect.left - self.pipes[self.next_pipe].speed * self.deltatime) % (-self.ground_image.get_width() // 2)
+            self.ground_image.move(-PIPE_SPEED * self.deltatime)
 
         if self.pipes[self.next_pipe].top_pipe.rect.right < self.player.rect.left:
             self.score += 1
@@ -61,7 +60,7 @@ class Game:
         for pipe in self.pipes:
             pipe.draw(DISPLAYSURF)
 
-        DISPLAYSURF.blit(self.ground_image, self.ground_rect)
+        self.ground_image.draw(DISPLAYSURF)
 
         score_text = FONT_SMALL.render(str(self.score), True, WHITE)
         DISPLAYSURF.blit(score_text, (SCREEN_WIDTH - 100, 10))
