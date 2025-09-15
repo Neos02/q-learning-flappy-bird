@@ -140,4 +140,4 @@ class Game:
             if pygame.sprite.spritecollideany(self.player, pipe):
                 return True
 
-        return self.player.is_off_screen()
+        return self.player.rect.bottom > SCREEN_HEIGHT - self.ground_image.image.get_height()

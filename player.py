@@ -42,9 +42,6 @@ class Player(pygame.sprite.Sprite):
         rotated_image = pygame.transform.rotate(self.image, clamp(-self.velocity_y / 20, -45, 45))
         surface.blit(rotated_image, self.rect)
 
-    def is_off_screen(self):
-        return self.rect.bottom > SCREEN_HEIGHT
-
     def can_jump(self):
         ticks = pygame.time.get_ticks()
         return ticks - self.last_jump_time >= self.jump_cooldown_ms
