@@ -136,8 +136,7 @@ class Game:
         return current_state, reward, is_dead
 
     def is_player_dead(self):
-        for pipe in self.pipes:
-            if pygame.sprite.spritecollideany(self.player, pipe):
-                return True
+        if pygame.sprite.spritecollideany(self.player, self.pipes[self.next_pipe]):
+            return True
 
         return self.player.rect.bottom > SCREEN_HEIGHT - self.ground_image.image.get_height()
