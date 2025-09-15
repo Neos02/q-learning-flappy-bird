@@ -17,7 +17,7 @@ class ScrollingImage(pygame.sprite.Sprite):
             self.rect.left += self.image.get_width()
 
     def draw(self, screen):
-        for i in range(SCREEN_WIDTH // self.image.get_width() + 1):
+        for i in range(SCREEN_WIDTH // self.image.get_width() + 2):
             screen.blit(
                 self.image,
                 pygame.Rect(

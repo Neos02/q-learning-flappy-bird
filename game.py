@@ -33,8 +33,22 @@ class Game:
         self.next_pipe = 0
         self.player = Player()
         self.score = 0
+
+        # load ground image
         self.ground_image = ScrollingImage("images/ground.png")
-        self.ground_image.rect.top = SCREEN_HEIGHT - self.ground_image.image.get_height()
+        self.ground_image.rect.bottom = SCREEN_HEIGHT
+
+        # load bush image
+        self.bush_image = ScrollingImage("images/bush.png")
+        self.bush_image.rect.bottom = SCREEN_HEIGHT - self.ground_image.image.get_height()
+
+        # load city image
+        self.city_image = ScrollingImage("images/city.png")
+        self.city_image.rect.bottom = SCREEN_HEIGHT - self.ground_image.image.get_height() - self.bush_image.image.get_height() + 6
+
+        # load cloud image
+        self.cloud_image = ScrollingImage("images/cloud.png")
+        self.cloud_image.rect.bottom = SCREEN_HEIGHT - self.ground_image.image.get_height() - self.bush_image.image.get_height() - self.city_image.image.get_height() + 6 + 26
 
     def _move(self):
         self.player.move(self.deltatime)
@@ -48,6 +62,9 @@ class Game:
                     self.rightmost_pipe = pipe
 
             self.ground_image.move(-PIPE_SPEED * self.deltatime)
+            self.bush_image.move(-PIPE_SPEED * self.deltatime)
+            self.city_image.move(-PIPE_SPEED * self.deltatime)
+            self.cloud_image.move(-PIPE_SPEED * self.deltatime)
 
         if self.pipes[self.next_pipe].top_pipe.rect.right < self.player.rect.left:
             self.score += 1
@@ -55,6 +72,9 @@ class Game:
 
     def _draw(self):
         DISPLAYSURF.fill(BLUE)
+        self.cloud_image.draw(DISPLAYSURF)
+        self.city_image.draw(DISPLAYSURF)
+        self.bush_image.draw(DISPLAYSURF)
         self.player.draw(DISPLAYSURF)
 
         for pipe in self.pipes:
