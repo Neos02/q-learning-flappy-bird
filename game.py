@@ -41,7 +41,7 @@ class Game:
 
         # load game over image
         self.game_over_image = pygame.transform.scale_by(pygame.image.load("images/game-over.png").convert_alpha(), IMAGE_SCALE_FACTOR * 2)
-  
+
     def _move(self):
         self.player.move(self.deltatime)
 
@@ -52,6 +52,7 @@ class Game:
                 if pipe.is_off_screen():
                     pipe.set_left(self.rightmost_pipe.top_pipe.rect.right + PIPE_GAP)
                     self.rightmost_pipe = pipe
+                    pipe.set_height()
 
             self.ground_image.move(-PIPE_SPEED * self.deltatime)
             self.bush_image.move(-PIPE_SPEED * self.deltatime)
