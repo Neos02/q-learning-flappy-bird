@@ -7,7 +7,7 @@ import pygame
 from game import Game
 from pygame.locals import *
 
-from main import CLOCK, FPS, GAME_STATE_SCALE_FACTOR, SCREEN_HEIGHT, PIPE_GAP
+from main import CLOCK, FPS, GAME_STATE_SCALE_FACTOR, PIPE_GAP
 
 
 class Agent:
@@ -19,8 +19,8 @@ class Agent:
         self.epsilon_decay = 0.99
         self.epsilon_min = 0
         self.epochs = 10000
-        self.table = np.zeros((PIPE_GAP // GAME_STATE_SCALE_FACTOR, SCREEN_HEIGHT // GAME_STATE_SCALE_FACTOR * 2, 2))
-        self.game = None
+        self.game = Game()
+        self.table = np.zeros(((PIPE_GAP + self.game.pipes[0].top_pipe.rect.width) // 2 // GAME_STATE_SCALE_FACTOR + 1, 2 * self.game.pipes[0].gap // GAME_STATE_SCALE_FACTOR + 2, 2))
         self.score = []
 
     def get_action(self, state):
@@ -64,15 +64,15 @@ class Agent:
                         pygame.quit()
                         sys.exit()
 
-                if self.game.get_state() != prev_state:
-                    # get best action and take it
-                    action = self.get_action(current_state)
-                    new_state, reward, done = self.game.step(action)
+                # get best action and take it
+                action = 0 if current_state == prev_state else self.get_action(current_state)
+                new_state, reward, done = self.game.step(action)
+                prev_state = current_state
 
-                    # update table using Bellman equation
-                    self.table[current_state][action] = (1 - self.learning_rate) * self.table[current_state][action]\
-                        + self.learning_rate * (reward + self.discount_factor * np.max(self.table[new_state]))
-                    current_state = new_state
+                # update table using Bellman equation
+                self.table[current_state][action] = (1 - self.learning_rate) * self.table[current_state][action]\
+                    + self.learning_rate * (reward + self.discount_factor * np.max(self.table[new_state]))
+                current_state = new_state
 
                 self.game.deltatime = CLOCK.tick(FPS) / 1000
 

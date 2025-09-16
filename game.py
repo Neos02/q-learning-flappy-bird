@@ -104,12 +104,23 @@ class Game:
     def get_state(self):
         pipe = self.pipes[self.next_pipe]
         pipe_right_center = (pipe.top_pipe.rect.right, pipe.top_pipe.rect.bottom + pipe.gap / 2)
-        max_horizontal_distance = (PIPE_GAP // GAME_STATE_SCALE_FACTOR) - 1
-        horizontal_distance = min((pipe_right_center[0] - self.player.rect.left) // GAME_STATE_SCALE_FACTOR, max_horizontal_distance)
+
+        # get the horizontal distance between the player's left edge and the pipe's right edge
+        # if the distance is greater than half the pipe gap then treat that as one state, otherwise
+        # scale distance down to create a new state for every N pixels
+        max_horizontal_distance = (PIPE_GAP + pipe.top_pipe.rect.width) // 2
+        horizontal_distance = min((pipe_right_center[0] - self.player.rect.left), max_horizontal_distance)
+
+        # get the vertical distance between the player's center and the pipe's center
+        # if the distance is greater than the pipe opening size then treat that as one state, otherwise
+        # scale distance down to create a new state for every N pixels
+        max_vertical_distance = pipe.gap
+        vertical_distance = max(-max_vertical_distance, min((pipe_right_center[1] - self.player.rect.center[1]), max_vertical_distance))
+        game_state_vertical_distance = vertical_distance if vertical_distance >= 0 else max_vertical_distance - vertical_distance
 
         return (
-            int(horizontal_distance),  # scaled horizontal distance from center of pipe
-            int(max(0, (pipe_right_center[1] - self.player.rect.center[1] + SCREEN_HEIGHT) // GAME_STATE_SCALE_FACTOR))  # scaled + shifted vertical distance from center of pipe
+            int(horizontal_distance // GAME_STATE_SCALE_FACTOR),  # scaled horizontal distance from right of pipe
+            int(game_state_vertical_distance // GAME_STATE_SCALE_FACTOR)  # scaled + adjusted vertical distance from center of pipe
         )
 
     def step(self, action):
