@@ -6,7 +6,7 @@ import pygame
 
 from pygame.locals import *
 from main import SCREEN_WIDTH, DISPLAYSURF, BLUE, CLOCK, FPS, PIPE_WIDTH, RED, SCREEN_HEIGHT, FONT_LARGE, WHITE, \
-    FONT_SMALL, GAME_STATE_SCALE_FACTOR, PIPE_GAP, PIPE_SPEED
+    FONT_SMALL, GAME_STATE_SCALE_FACTOR, PIPE_GAP, PIPE_SPEED, BLACK
 from player import Player
 from pipe import Pipe
 from scrolling_image import ScrollingImage
@@ -81,9 +81,19 @@ class Game:
             pipe.draw(DISPLAYSURF)
 
         self.ground_image.draw(DISPLAYSURF)
+        self._draw_score(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 10, 3)
 
-        score_text = FONT_SMALL.render(str(self.score), True, WHITE)
-        DISPLAYSURF.blit(score_text, (SCREEN_WIDTH - 100, 10))
+    def _draw_score(self, x, y, border_width=0):
+        score_text_white = FONT_SMALL.render(str(self.score), True, WHITE)
+        score_text_black = FONT_SMALL.render(str(self.score), True, BLACK)
+
+        if border_width > 0:
+            DISPLAYSURF.blit(score_text_black, (x - border_width, y - border_width))
+            DISPLAYSURF.blit(score_text_black, (x - border_width, y + border_width))
+            DISPLAYSURF.blit(score_text_black, (x + border_width, y - border_width))
+            DISPLAYSURF.blit(score_text_black, (x + border_width, y + border_width))
+
+        DISPLAYSURF.blit(score_text_white, (x, y))
 
     def run(self):
         while 1:
