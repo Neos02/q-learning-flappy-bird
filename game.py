@@ -1,12 +1,11 @@
 import math
 import sys
 import time
-
 import pygame
 
 from pygame.locals import *
-from main import SCREEN_WIDTH, DISPLAYSURF, BLUE, CLOCK, FPS, PIPE_WIDTH, RED, SCREEN_HEIGHT, FONT_LARGE, WHITE, \
-    FONT_NUMBERS, GAME_STATE_SCALE_FACTOR, PIPE_GAP, PIPE_SPEED, BLACK
+from main import SCREEN_WIDTH, DISPLAYSURF, BLUE, CLOCK, FPS, PIPE_WIDTH, SCREEN_HEIGHT, WHITE, \
+    FONT_NUMBERS, GAME_STATE_SCALE_FACTOR, PIPE_GAP, PIPE_SPEED, BLACK, IMAGE_SCALE_FACTOR
 from player import Player
 from pipe import Pipe
 from scrolling_image import ScrollingImage
@@ -40,6 +39,9 @@ class Game:
         self.cloud_image = ScrollingImage("images/cloud.png")
         self.cloud_image.rect.bottom = SCREEN_HEIGHT - self.ground_image.image.get_height() - self.bush_image.image.get_height() - self.city_image.image.get_height() + 6 + 26
 
+        # load game over image
+        self.game_over_image = pygame.transform.scale_by(pygame.image.load("images/game-over.png").convert_alpha(), IMAGE_SCALE_FACTOR * 2)
+  
     def _move(self):
         self.player.move(self.deltatime)
 
@@ -159,8 +161,7 @@ class Game:
         return self.player.rect.top > SCREEN_HEIGHT
 
     def game_over(self):
-        game_over_text = FONT_LARGE.render("GAME OVER", True, WHITE)
-        DISPLAYSURF.blit(game_over_text, ((SCREEN_WIDTH - game_over_text.get_width()) / 2, (SCREEN_HEIGHT - game_over_text.get_height()) / 2))
+        DISPLAYSURF.blit(self.game_over_image, ((SCREEN_WIDTH - self.game_over_image.get_width()) / 2, (SCREEN_HEIGHT - self.game_over_image.get_height()) / 2))
         self.player.rotation_angle_deg = 180
         self.player.is_agent = True
         self.is_game_over = True

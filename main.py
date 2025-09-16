@@ -20,7 +20,6 @@ PIPE_GAP = 180
 PIPE_SPEED = 200
 
 FONT_NUMBERS = pygame.font.Font("fonts/flappy-numbers.ttf", 24)
-FONT_LARGE = pygame.font.SysFont("Verdana", 60)
 
 IMAGE_SCALE_FACTOR = 2
 GAME_STATE_SCALE_FACTOR = 10
