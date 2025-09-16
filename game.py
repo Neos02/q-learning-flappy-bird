@@ -77,6 +77,9 @@ class Game:
         score_text_white = FONT_NUMBERS.render(str(self.score), True, WHITE)
         score_text_black = FONT_NUMBERS.render(str(self.score), True, BLACK)
 
+        x -= score_text_white.get_width() / 2
+        y -= score_text_white.get_height() / 2
+
         if border_width > 0:
             DISPLAYSURF.blit(score_text_black, (x - border_width, y - border_width))
             DISPLAYSURF.blit(score_text_black, (x - border_width, y + border_width))
