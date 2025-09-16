@@ -9,15 +9,23 @@ from pygame.locals import *
 from main import CLOCK, FPS, GAME_STATE_SCALE_FACTOR, PIPE_GAP
 
 
+def _handle_events():
+    for event in pygame.event.get():
+        if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
+            pygame.quit()
+            sys.exit()
+
+
 class Agent:
 
-    def __init__(self):
+    def __init__(self, model_dir="models"):
         self.learning_rate = 0.01
         self.discount_factor = 0.95
         self.epochs = 10000
         self.game = Game()
         self.table = np.zeros(((PIPE_GAP + self.game.pipes[0].top_pipe.rect.width) // 2 // GAME_STATE_SCALE_FACTOR + 1, 2 * self.game.pipes[0].gap // GAME_STATE_SCALE_FACTOR + 2, 2))
         self.score = []
+        self.model_dir = model_dir
 
     def get_action(self, state):
         if not self.game.player.has_jumped:
@@ -43,15 +51,12 @@ class Agent:
 
             # occasionally save latest model
             if is_checkpoint:
-                with open(f'models/bird_model_{epoch}.pickle', 'wb') as file:
+                with open(f'{self.model_dir}/bird_model_{epoch}.pickle', 'wb') as file:
                     # noinspection PyTypeChecker
                     pickle.dump(self.table, file)
 
             while not done:
-                for event in pygame.event.get():
-                    if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
-                        pygame.quit()
-                        sys.exit()
+                _handle_events()
 
                 # get best action and take it
                 action = 0 if current_state == prev_state else self.get_action(current_state)
@@ -67,8 +72,25 @@ class Agent:
 
             self.score.append(self.game.score)
 
+    def run_epoch(self, epoch):
+        self._load_model(epoch)
+        self.game = Game()
+        current_state = self.game.get_state()
+        prev_state = None
+        done = False
+
+        while not done:
+            _handle_events()
+
+            # get best action and take it
+            action = 0 if current_state == prev_state else self.get_action(current_state)
+            new_state, reward, done = self.game.step(action)
+            prev_state = current_state
+            current_state = new_state
+            self.game.deltatime = CLOCK.tick(FPS) / 1000
+
     def _load_model(self, epoch):
-        filename = f'models/bird_model_{epoch}.pickle'
+        filename = f'{self.model_dir}/bird_model_{epoch}.pickle'
 
         with open(filename, 'rb') as file:
             self.table = pickle.load(file)
