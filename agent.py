@@ -1,4 +1,3 @@
-import random
 import sys
 import pickle
 import numpy as np
@@ -15,9 +14,6 @@ class Agent:
     def __init__(self):
         self.learning_rate = 0.01
         self.discount_factor = 0.95
-        self.epsilon = 0
-        self.epsilon_decay = 0.99
-        self.epsilon_min = 0
         self.epochs = 10000
         self.game = Game()
         self.table = np.zeros(((PIPE_GAP + self.game.pipes[0].top_pipe.rect.width) // 2 // GAME_STATE_SCALE_FACTOR + 1, 2 * self.game.pipes[0].gap // GAME_STATE_SCALE_FACTOR + 2, 2))
@@ -26,9 +22,6 @@ class Agent:
     def get_action(self, state):
         if not self.game.player.has_jumped:
             return 1
-
-        if random.random() < self.epsilon:
-            return random.choice([0, 1])
 
         return np.argmax(self.table[state])
 
@@ -43,12 +36,9 @@ class Agent:
             done = False
             is_checkpoint = (epoch <= 100 and epoch % 10 == 0) or epoch % 100 == 0
 
-            # decay epsilon
-            self.epsilon = max(self.epsilon * self.epsilon_decay, self.epsilon_min)
-
             # print updates
             if epoch % 25 == 0 and len(self.score) > 0:
-                print(f'Epoch: {epoch}, Score: {np.mean(self.score)}, Epsilon: {self.epsilon}')
+                print(f'Epoch: {epoch}, Score: {np.mean(self.score)}')
                 self.score = []
 
             # occasionally save latest model
@@ -82,6 +72,3 @@ class Agent:
 
         with open(filename, 'rb') as file:
             self.table = pickle.load(file)
-
-        # calculate this epoch's epsilon value to prevent random actions
-        self.epsilon = max(self.epsilon * self.epsilon_decay ** epoch, self.epsilon_min)
