@@ -68,6 +68,10 @@ class Agent:
                     + self.learning_rate * (reward + self.discount_factor * np.max(self.table[new_state]))
                 current_state = new_state
 
+                # prevent running infinitely
+                if self.game.score > 100:
+                    break
+
                 self.game.deltatime = CLOCK.tick(FPS) / 1000
 
             self.score.append(self.game.score)
