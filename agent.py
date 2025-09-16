@@ -22,7 +22,7 @@ class Agent:
         self.learning_rate = 0.01
         self.discount_factor = 0.95
         self.epochs = 10000
-        self.game = Game()
+        self.game = Game(is_agent=True)
         self.table = np.zeros(((PIPE_GAP + self.game.pipes[0].top_pipe.rect.width) // 2 // GAME_STATE_SCALE_FACTOR + 1, 2 * self.game.pipes[0].gap // GAME_STATE_SCALE_FACTOR + 2, 2))
         self.score = []
         self.model_dir = model_dir
@@ -38,7 +38,7 @@ class Agent:
             self._load_model(epoch)
 
         for epoch in range(epoch, self.epochs + 1):
-            self.game = Game()
+            self.game = Game(is_agent=True)
             current_state = self.game.get_state()
             prev_state = None
             done = False
@@ -74,7 +74,7 @@ class Agent:
 
     def run_epoch(self, epoch):
         self._load_model(epoch)
-        self.game = Game()
+        self.game = Game(is_agent=True)
         current_state = self.game.get_state()
         prev_state = None
         done = False

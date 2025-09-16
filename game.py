@@ -6,33 +6,23 @@ import pygame
 
 from pygame.locals import *
 from main import SCREEN_WIDTH, DISPLAYSURF, BLUE, CLOCK, FPS, PIPE_WIDTH, RED, SCREEN_HEIGHT, FONT_LARGE, WHITE, \
-    FONT_SMALL, GAME_STATE_SCALE_FACTOR, PIPE_GAP, PIPE_SPEED, BLACK
+    FONT_NUMBERS, GAME_STATE_SCALE_FACTOR, PIPE_GAP, PIPE_SPEED, BLACK
 from player import Player
 from pipe import Pipe
 from scrolling_image import ScrollingImage
 
 
-def game_over():
-    game_over_text = FONT_LARGE.render("GAME OVER", True, WHITE)
-    DISPLAYSURF.fill(RED)
-    DISPLAYSURF.blit(game_over_text, ((SCREEN_WIDTH - game_over_text.get_width()) / 2, (SCREEN_HEIGHT - game_over_text.get_height()) / 2))
-
-    pygame.display.update()
-    time.sleep(2)
-    pygame.quit()
-    sys.exit()
-
-
 class Game:
 
-    def __init__(self):
+    def __init__(self, is_agent=False):
         self.deltatime = 0
         self.num_pipes = math.ceil(SCREEN_WIDTH / (PIPE_GAP + PIPE_WIDTH))
         self.pipes = [Pipe(i * (PIPE_GAP + PIPE_WIDTH) + SCREEN_WIDTH // 2, (SCREEN_HEIGHT - PIPE_GAP) // 2 if i == 0 else None) for i in range(self.num_pipes)]
         self.rightmost_pipe = self.pipes[self.num_pipes - 1]
         self.next_pipe = 0
-        self.player = Player()
+        self.player = Player(is_agent)
         self.score = 0
+        self.is_game_over = False
 
         # load ground image
         self.ground_image = ScrollingImage("images/ground.png")
@@ -53,7 +43,7 @@ class Game:
     def _move(self):
         self.player.move(self.deltatime)
 
-        if self.player.has_jumped:
+        if self.player.has_jumped and not self.is_game_over:
             for pipe in self.pipes:
                 pipe.move(self.deltatime)
 
@@ -84,8 +74,8 @@ class Game:
         self._draw_score(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 10, 3)
 
     def _draw_score(self, x, y, border_width=0):
-        score_text_white = FONT_SMALL.render(str(self.score), True, WHITE)
-        score_text_black = FONT_SMALL.render(str(self.score), True, BLACK)
+        score_text_white = FONT_NUMBERS.render(str(self.score), True, WHITE)
+        score_text_black = FONT_NUMBERS.render(str(self.score), True, BLACK)
 
         if border_width > 0:
             DISPLAYSURF.blit(score_text_black, (x - border_width, y - border_width))
@@ -105,8 +95,8 @@ class Game:
             self._move()
             self._draw()
 
-            if self.is_player_dead():
-                game_over()
+            if self.is_player_dead() or self.is_game_over:
+                self.game_over()
 
             pygame.display.flip()
             self.deltatime = CLOCK.tick(FPS) / 1000
@@ -161,3 +151,18 @@ class Game:
             return True
 
         return self.player.rect.bottom > SCREEN_HEIGHT - self.ground_image.image.get_height()
+
+    def is_player_off_screen(self):
+        return self.player.rect.top > SCREEN_HEIGHT
+
+    def game_over(self):
+        game_over_text = FONT_LARGE.render("GAME OVER", True, WHITE)
+        DISPLAYSURF.blit(game_over_text, ((SCREEN_WIDTH - game_over_text.get_width()) / 2, (SCREEN_HEIGHT - game_over_text.get_height()) / 2))
+        self.player.rotation_angle_deg = 180
+        self.player.is_agent = True
+        self.is_game_over = True
+
+        if self.is_player_off_screen():
+            time.sleep(2)
+            pygame.quit()
+            sys.exit()
