@@ -4,10 +4,10 @@ import time
 import pygame
 
 from pygame.locals import *
-from main import SCREEN_WIDTH, DISPLAYSURF, BLUE, CLOCK, FPS, PIPE_WIDTH, SCREEN_HEIGHT, WHITE, \
+from main import SCREEN_WIDTH, DISPLAYSURF, BLUE, CLOCK, FPS, SCREEN_HEIGHT, WHITE, \
     FONT_NUMBERS, GAME_STATE_SCALE_FACTOR, PIPE_GAP, PIPE_SPEED, BLACK, IMAGE_SCALE_FACTOR
 from player import Player
-from pipe import Pipe
+from pipe import Pipe, PIPE_WIDTH
 from scrolling_image import ScrollingImage
 
 
@@ -16,7 +16,7 @@ class Game:
     def __init__(self, is_agent=False):
         self.deltatime = 0
         self.num_pipes = math.ceil(SCREEN_WIDTH / (PIPE_GAP + PIPE_WIDTH))
-        self.pipes = [Pipe(i * (PIPE_GAP + PIPE_WIDTH) + SCREEN_WIDTH // 2, (SCREEN_HEIGHT - PIPE_GAP) // 2 if i == 0 else None) for i in range(self.num_pipes)]
+        self.pipes = [Pipe((SCREEN_WIDTH / 2 + i * (PIPE_GAP + PIPE_WIDTH), SCREEN_HEIGHT // 2 if i == 0 else Pipe.get_random_height())) for i in range(self.num_pipes)]
         self.rightmost_pipe = self.pipes[self.num_pipes - 1]
         self.next_pipe = 0
         self.player = Player(is_agent)
@@ -50,16 +50,15 @@ class Game:
                 pipe.move(self.deltatime)
 
                 if pipe.is_off_screen():
-                    pipe.set_left(self.rightmost_pipe.top_pipe.rect.right + PIPE_GAP)
+                    pipe.center = (self.rightmost_pipe.center[0] + PIPE_GAP + PIPE_WIDTH, Pipe.get_random_height())
                     self.rightmost_pipe = pipe
-                    pipe.set_height()
 
             self.ground_image.move(-PIPE_SPEED * self.deltatime)
             self.bush_image.move(-PIPE_SPEED * self.deltatime)
             self.city_image.move(-PIPE_SPEED * self.deltatime)
             self.cloud_image.move(-PIPE_SPEED * self.deltatime)
 
-        if self.pipes[self.next_pipe].top_pipe.rect.right < self.player.rect.left:
+        if self.pipes[self.next_pipe].upper.rect.right < self.player.rect.left:
             self.score += 1
             self.next_pipe = (self.next_pipe + 1) % self.num_pipes
 
@@ -109,18 +108,18 @@ class Game:
 
     def get_state(self):
         pipe = self.pipes[self.next_pipe]
-        pipe_right_center = (pipe.top_pipe.rect.right, pipe.top_pipe.rect.bottom + pipe.gap / 2)
+        pipe_right_center = (pipe.center[0] + PIPE_WIDTH / 2, pipe.center[1])
 
         # get the horizontal distance between the player's left edge and the pipe's right edge
         # if the distance is greater than half the pipe gap then treat that as one state, otherwise
         # scale distance down to create a new state for every N pixels
-        max_horizontal_distance = (PIPE_GAP + pipe.top_pipe.rect.width) // 2
+        max_horizontal_distance = (PIPE_GAP + pipe.upper.rect.width) // 2
         horizontal_distance = min((pipe_right_center[0] - self.player.rect.left), max_horizontal_distance)
 
         # get the vertical distance between the player's center and the pipe's center
         # if the distance is greater than the pipe opening size then treat that as one state, otherwise
         # scale distance down to create a new state for every N pixels
-        max_vertical_distance = pipe.gap
+        max_vertical_distance = PIPE_GAP
         vertical_distance = max(-max_vertical_distance, min((pipe_right_center[1] - self.player.rect.center[1]), max_vertical_distance))
         game_state_vertical_distance = vertical_distance if vertical_distance >= 0 else max_vertical_distance - vertical_distance
 

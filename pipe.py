@@ -1,40 +1,52 @@
 import random
 import pygame
 
-from main import SCREEN_HEIGHT, PIPE_SPEED
+from main import SCREEN_HEIGHT, PIPE_SPEED, IMAGE_SCALE_FACTOR
 from pipe_half import PipeHalf
+
+MIN_PIPE_HEIGHT = 100
+PIPE_GAP_HEIGHT = 180
+PIPE_IMAGE = pygame.transform.scale_by(pygame.image.load('images/pipe.png').convert_alpha(), IMAGE_SCALE_FACTOR)
+PIPE_WIDTH = PIPE_IMAGE.get_width()
 
 
 class Pipe(pygame.sprite.Group):
 
-    def __init__(self, left, height=None):
+    def __init__(self, center=None):
         super().__init__()
-        self.gap = 180
-        self.min_pipe_height = 50
-        self.gap_top = 0
-        self.left = left
-        self.top_pipe = PipeHalf(self.left, self.gap_top)
-        self.bottom_pipe = PipeHalf(self.left, self.gap + self.gap_top, True)
-        self.set_height(height)
-        self.add(self.top_pipe, self.bottom_pipe)
+        self.image = PIPE_IMAGE
+        self.upper = PipeHalf()
+        self.lower = PipeHalf(True)
+        self.center = center
+        self.add(self.upper, self.lower)
 
     def move(self, deltatime):
-        self.top_pipe.move(-PIPE_SPEED * deltatime)
-        self.bottom_pipe.move(-PIPE_SPEED * deltatime)
+        self.center = (self.center[0] - PIPE_SPEED * deltatime, self.center[1])
 
     def draw(self, surface):
-        self.top_pipe.draw(surface)
-        self.bottom_pipe.draw(surface)
+        for sprite in self.sprites():
+            sprite.draw(surface)
 
     def is_off_screen(self):
-        return self.top_pipe.rect.right < 0
+        return self.upper.rect.right < 0
 
-    def set_left(self, left):
-        self.left = left
-        self.top_pipe.rect.left = left
-        self.bottom_pipe.rect.left = left
+    def randomize_height(self):
+        self.center = (self.center[0], Pipe.get_random_height())
 
-    def set_height(self, height=None):
-        self.gap_top = random.randint(self.min_pipe_height, SCREEN_HEIGHT - self.gap - self.min_pipe_height) if height is None else height
-        self.top_pipe.rect.bottom = self.gap_top
-        self.bottom_pipe.rect.top = self.gap + self.gap_top
+    @property
+    def center(self):
+        return self._center
+
+    @center.setter
+    def center(self, value):
+        self._center = (0, 0) if value is None else value
+
+        self.upper.rect.left = self._center[0] - self.image.get_width() / 2
+        self.upper.rect.bottom = self._center[1] - PIPE_GAP_HEIGHT / 2
+
+        self.lower.rect.left = self.upper.rect.left
+        self.lower.rect.top = self.upper.rect.bottom + PIPE_GAP_HEIGHT
+
+    @staticmethod
+    def get_random_height():
+        return random.randint(MIN_PIPE_HEIGHT, SCREEN_HEIGHT - PIPE_GAP_HEIGHT - MIN_PIPE_HEIGHT)

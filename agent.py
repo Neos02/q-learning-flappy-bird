@@ -7,6 +7,7 @@ from game import Game
 from pygame.locals import *
 
 from main import CLOCK, FPS, GAME_STATE_SCALE_FACTOR, PIPE_GAP
+from pipe import PIPE_WIDTH
 
 
 def _handle_events():
@@ -23,7 +24,7 @@ class Agent:
         self.discount_factor = 0.95
         self.epochs = 10000
         self.game = Game(is_agent=True)
-        self.table = np.zeros(((PIPE_GAP + self.game.pipes[0].top_pipe.rect.width) // 2 // GAME_STATE_SCALE_FACTOR + 1, 2 * self.game.pipes[0].gap // GAME_STATE_SCALE_FACTOR + 2, 2))
+        self.table = np.zeros(((PIPE_GAP + PIPE_WIDTH) // 2 // GAME_STATE_SCALE_FACTOR + 1, 2 * PIPE_GAP // GAME_STATE_SCALE_FACTOR + 2, 2))
         self.score = []
         self.model_dir = model_dir
 
