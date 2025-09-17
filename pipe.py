@@ -15,11 +15,11 @@ class Pipe(pygame.sprite.Group):
         super().__init__()
         self.upper = PipeHalf()
         self.lower = PipeHalf(True)
-        self.center = center
         self.add(self.upper, self.lower)
+        self.center = center
 
     def move(self, speed):
-        self._center = (self.center[0] + speed, self.center[1])
+        self._center = (round(self.center[0] + speed), self.center[1])
 
         for sprite in self.sprites():
             sprite.move(speed)
@@ -36,13 +36,10 @@ class Pipe(pygame.sprite.Group):
 
     @center.setter
     def center(self, value):
-        self._center = (0, 0) if value is None else value
+        self._center = (0, 0) if value is None else (round(value[0]), round(value[1]))
 
-        self.upper.rect.left = self._center[0] - Pipe.width / 2
-        self.upper.rect.bottom = self._center[1] - Pipe.gap_height / 2
-
-        self.lower.rect.left = self.upper.rect.left
-        self.lower.rect.top = self.upper.rect.bottom + Pipe.gap_height
+        self.upper.rect.center = (self._center[0], self._center[1] - Pipe.gap_height / 2 - PipeHalf.image.get_height() / 2)
+        self.lower.rect.center = (self._center[0], self._center[1] + Pipe.gap_height / 2 + PipeHalf.image.get_height() / 2)
 
     @staticmethod
     def get_random_height():

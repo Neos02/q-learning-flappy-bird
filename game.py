@@ -1,6 +1,8 @@
 import math
 import sys
 import time
+from time import sleep
+
 import pygame
 
 from pygame.locals import *
@@ -54,7 +56,7 @@ class Game:
                 pipe.move(Game.world_speed * self.deltatime)
 
                 if pipe.is_off_screen():
-                    pipe.center = (self.rightmost_pipe.center[0] + Game.pipe_gap + Pipe.width, Pipe.get_random_height())
+                    pipe.center = (self.rightmost_pipe.center[0] + (Game.pipe_gap + Pipe.width), Pipe.get_random_height())
                     self.rightmost_pipe = pipe
 
             self.ground_image.move(Game.world_speed * self.deltatime)
