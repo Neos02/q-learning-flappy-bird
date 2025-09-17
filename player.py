@@ -1,17 +1,18 @@
 import pygame
 from pygame.math import clamp
 
-from main import SCREEN_WIDTH, SCREEN_HEIGHT, IMAGE_SCALE_FACTOR
+from main import SCREEN_WIDTH, SCREEN_HEIGHT, load_image
 from pygame.locals import *
 
 
 class Player(pygame.sprite.Sprite):
 
+    bird_fall_image = load_image('images/bird.png')
+    bird_flap_image = load_image('images/bird-flap.png')
+
     def __init__(self, is_agent=False):
         super().__init__()
-        self.bird_image = pygame.transform.scale_by(pygame.image.load('images/bird.png').convert_alpha(), IMAGE_SCALE_FACTOR)
-        self.bird_flap_image = pygame.transform.scale_by(pygame.image.load('images/bird-flap.png').convert_alpha(), IMAGE_SCALE_FACTOR)
-        self.image = self.bird_image
+        self.image = Player.bird_fall_image
         self.gravity = 1400
         self.velocity_y = 0
         self.size = 20
@@ -33,9 +34,9 @@ class Player(pygame.sprite.Sprite):
 
         # show flap image when the bird is moving up
         if self.velocity_y < 0:
-            self.image = self.bird_flap_image
+            self.image = Player.bird_flap_image
         else:
-            self.image = self.bird_image
+            self.image = Player.bird_fall_image
 
         if self.has_jumped:
             self.velocity_y += self.gravity * deltatime

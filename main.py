@@ -6,27 +6,22 @@ pygame.init()
 
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
-RED = (200, 50, 50)
 BLUE = (112, 197, 206)
 
 FPS = 60
-CLOCK = pygame.time.Clock()
-
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
-
-PIPE_GAP = 180
-PIPE_SPEED = 200
 
 FONT_NUMBERS = pygame.font.Font("fonts/flappy-numbers.ttf", 24)
 
-IMAGE_SCALE_FACTOR = 2
-GAME_STATE_SCALE_FACTOR = 10
-
+SCREEN_WIDTH = 800
+SCREEN_HEIGHT = 600
 DISPLAYSURF = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), SCALED | DOUBLEBUF, vsync=1)
 pygame.display.set_caption('Flappy Bird')
 
 pygame.event.set_allowed([pygame.QUIT, pygame.KEYDOWN])
+
+
+def load_image(path, scale_factor=2):
+    return pygame.transform.scale_by(pygame.image.load(path).convert_alpha(), scale_factor)
 
 
 if __name__ == '__main__':

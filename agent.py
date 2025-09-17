@@ -6,8 +6,8 @@ import pygame
 from game import Game
 from pygame.locals import *
 
-from main import CLOCK, FPS, GAME_STATE_SCALE_FACTOR, PIPE_GAP
-from pipe import PIPE_WIDTH
+from main import FPS
+from pipe import Pipe
 
 
 def _handle_events():
@@ -24,7 +24,7 @@ class Agent:
         self.discount_factor = 0.95
         self.epochs = 10000
         self.game = Game(is_agent=True)
-        self.table = np.zeros(((PIPE_GAP + PIPE_WIDTH) // 2 // GAME_STATE_SCALE_FACTOR + 1, 2 * PIPE_GAP // GAME_STATE_SCALE_FACTOR + 2, 2))
+        self.table = np.zeros(((Game.pipe_gap + Pipe.width) // 2 // Game.state_distance_scale_factor + 1, 2 * Game.pipe_gap // Game.state_distance_scale_factor + 2, 2))
         self.score = []
         self.model_dir = model_dir
 
@@ -73,7 +73,7 @@ class Agent:
                 if self.game.score > 100:
                     break
 
-                self.game.deltatime = CLOCK.tick(FPS) / 1000
+                self.game.deltatime = pygame.time.Clock().tick(FPS) / 1000
 
             self.score.append(self.game.score)
 
@@ -92,7 +92,7 @@ class Agent:
             new_state, reward, done = self.game.step(action)
             prev_state = current_state
             current_state = new_state
-            self.game.deltatime = CLOCK.tick(FPS) / 1000
+            self.game.deltatime = pygame.time.Clock().tick(FPS) / 1000
 
     def _load_model(self, epoch):
         filename = f'{self.model_dir}/bird_model_{epoch}.pickle'

@@ -1,13 +1,13 @@
 import pygame
 
-from main import SCREEN_WIDTH, IMAGE_SCALE_FACTOR
+from main import SCREEN_WIDTH, load_image
 
 
 class ScrollingImage(pygame.sprite.Sprite):
 
     def __init__(self, image_path):
         super().__init__()
-        self.image = pygame.transform.scale_by(pygame.image.load(image_path).convert_alpha(), IMAGE_SCALE_FACTOR)
+        self.image = load_image(image_path)
         self.rect = self.image.get_rect()
 
     def move(self, speed):
