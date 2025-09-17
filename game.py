@@ -1,13 +1,12 @@
 import math
 import sys
 import time
-from time import sleep
 
 import pygame
 
 from pygame.locals import *
 from main import SCREEN_WIDTH, DISPLAYSURF, BLUE, FPS, SCREEN_HEIGHT, WHITE, \
-    FONT_NUMBERS, BLACK
+    FONT_NUMBERS, BLACK, load_image
 from player import Player
 from pipe import Pipe
 from scrolling_image import ScrollingImage
@@ -19,6 +18,12 @@ class Game:
     pipe_gap = 180
     state_distance_scale_factor = 10
 
+    ground_image = ScrollingImage("images/ground.png")
+    bush_image = ScrollingImage("images/bush.png", SCREEN_HEIGHT - ground_image.image.get_height())
+    city_image = ScrollingImage("images/city.png", SCREEN_HEIGHT - ground_image.image.get_height() - bush_image.image.get_height() + 6)
+    cloud_image = ScrollingImage("images/cloud.png", SCREEN_HEIGHT - ground_image.image.get_height() - bush_image.image.get_height() - city_image.image.get_height() + 6 + 26)
+    game_over_image = load_image("images/game-over.png", 4)
+
     def __init__(self, is_agent=False):
         self.deltatime = 0
         self.num_pipes = math.ceil(SCREEN_WIDTH / (Game.pipe_gap + Pipe.width))
@@ -29,25 +34,6 @@ class Game:
         self.score = 0
         self.is_game_over = False
 
-        # load ground image
-        self.ground_image = ScrollingImage("images/ground.png")
-        self.ground_image.rect.bottom = SCREEN_HEIGHT
-
-        # load bush image
-        self.bush_image = ScrollingImage("images/bush.png")
-        self.bush_image.rect.bottom = SCREEN_HEIGHT - self.ground_image.image.get_height()
-
-        # load city image
-        self.city_image = ScrollingImage("images/city.png")
-        self.city_image.rect.bottom = SCREEN_HEIGHT - self.ground_image.image.get_height() - self.bush_image.image.get_height() + 6
-
-        # load cloud image
-        self.cloud_image = ScrollingImage("images/cloud.png")
-        self.cloud_image.rect.bottom = SCREEN_HEIGHT - self.ground_image.image.get_height() - self.bush_image.image.get_height() - self.city_image.image.get_height() + 6 + 26
-
-        # load game over image
-        self.game_over_image = pygame.transform.scale_by(pygame.image.load("images/game-over.png").convert_alpha(), 4)
-
     def _move(self):
         self.player.move(self.deltatime)
 
@@ -55,7 +41,7 @@ class Game:
             for pipe in self.pipes:
                 pipe.move(Game.world_speed * self.deltatime)
 
-                if pipe.is_off_screen():
+                if pipe.is_off_screen_left():
                     pipe.center = (self.rightmost_pipe.center[0] + (Game.pipe_gap + Pipe.width), Pipe.get_random_height())
                     self.rightmost_pipe = pipe
 
@@ -70,15 +56,15 @@ class Game:
 
     def _draw(self):
         DISPLAYSURF.fill(BLUE)
-        self.cloud_image.draw(DISPLAYSURF)
-        self.city_image.draw(DISPLAYSURF)
-        self.bush_image.draw(DISPLAYSURF)
+        Game.cloud_image.draw(DISPLAYSURF)
+        Game.city_image.draw(DISPLAYSURF)
+        Game.bush_image.draw(DISPLAYSURF)
         self.player.draw(DISPLAYSURF)
 
         for pipe in self.pipes:
             pipe.draw(DISPLAYSURF)
 
-        self.ground_image.draw(DISPLAYSURF)
+        Game.ground_image.draw(DISPLAYSURF)
         self._draw_score(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 10, 3)
 
     def _draw_score(self, x, y, border_width=0):

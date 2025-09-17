@@ -19,12 +19,12 @@ class Pipe(pygame.sprite.Group):
         self.center = center
 
     def move(self, speed):
-        self._center = (round(self.center[0] + speed), self.center[1])
+        self._center = (round(self._center[0] + speed), self._center[1])
 
         for sprite in self.sprites():
             sprite.move(speed)
 
-    def is_off_screen(self):
+    def is_off_screen_left(self):
         return self.upper.rect.right < 0
 
     def randomize_height(self):
