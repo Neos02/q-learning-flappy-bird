@@ -24,10 +24,6 @@ class Pipe(pygame.sprite.Group):
         for sprite in self.sprites():
             sprite.move(speed)
 
-    def draw(self, surface):
-        for sprite in self.sprites():
-            sprite.draw(surface)
-
     def is_off_screen(self):
         return self.upper.rect.right < 0
 
